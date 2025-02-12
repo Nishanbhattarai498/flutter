@@ -1,16 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/services/shared_pref.dart';
+import 'package:intl/intl.dart';
+import 'package:random_string/random_string.dart';
 
 class ChatPage extends StatefulWidget {
-  String? name, picture, username;
-  ChatPage({this.name, this.picture, this.username});
+  String? name, profileUrl, username;
+  ChatPage({this.name, this.profileUrl, this.username});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
-  String? myUsername, myEmail, myName, mypicture, chatRoomId;
+  String? myUsername, myEmail, myName, mypicture, chatRoomId, messageId;
+  TextEditingController messageController = new TextEditingController();
 
   getthesharedpref() async {
     myUsername = await SharedPreferenceHelper().getUserName();
@@ -32,6 +36,24 @@ class _ChatPageState extends State<ChatPage> {
       return "$b\_$a";
     } else {
       return "$a\_$b";
+    }
+  }
+
+  addmessage(bool sendClicked) {
+    if (messageController.text != "") {
+      String message = messageController.text;
+      messageController.text = "";
+
+      DateTime now = DateTime.now();
+      String formattedDate = DateFormat('h:mma').format(now);
+      Map<String, dynamic> messageInfoMap = {
+        "message": message,
+        "sendBy": myUsername,
+        "ts": formattedDate,
+        "time": FieldValue.serverTimestamp(),
+        "imageUrl": mypicture,
+      };
+      messageId = randomAlphaNumeric(12);
     }
   }
 
@@ -168,6 +190,7 @@ class _ChatPageState extends State<ChatPage> {
                                   color: Color(0xffececf8),
                                   borderRadius: BorderRadius.circular(10)),
                               child: TextField(
+                                controller: messageController,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: "Write a messege",
