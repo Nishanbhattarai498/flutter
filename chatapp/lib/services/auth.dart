@@ -1,3 +1,4 @@
+import 'package:chatapp/pages/home.dart';
 import 'package:chatapp/services/database.dart';
 import 'package:chatapp/services/shared_pref.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,8 +41,8 @@ class AuthMethods {
 
     if (result != null) {
       Map<String, dynamic> userInfoMap = {
-        "Name": userDetails!.displayName,
-        "Email": userDetails!.email,
+        "Name": userDetails.displayName,
+        "Email": userDetails.email,
         "Image": userDetails.photoURL,
         "Id": userDetails.uid,
         "username": username.toUpperCase(),
@@ -49,17 +50,20 @@ class AuthMethods {
       };
 
       await DatabaseMethods()
-          .addUser(userInfoMap, userDetails!.uid)
+          .addUser(userInfoMap, userDetails.uid)
           .then((value) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             backgroundColor: Colors.green,
             content: Text(
               "Registered successfully!",
               style: TextStyle(
-                  color: Colors.black,
+                  color: Colors.white,
                   fontSize: 22.0,
                   fontWeight: FontWeight.bold),
             )));
+
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => Home()));
       });
     }
   }

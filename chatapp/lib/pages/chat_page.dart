@@ -1,13 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:chatapp/services/shared_pref.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key});
+  String? name, picture, username;
+  ChatPage({this.name, this.picture, this.username});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
+  String? myUsername, myEmail, myName, mypicture, chatRoomId;
+
+  getthesharedpref() async {
+    myUsername = await SharedPreferenceHelper().getUserName();
+    myEmail = await SharedPreferenceHelper().getUserEmail();
+    myName = await SharedPreferenceHelper().getUserDisplayName();
+    mypicture = await SharedPreferenceHelper().getUserImage();
+    chatRoomId = getChatRoomIdbyUsername(widget.username!, myUsername!);
+
+    setState(() {});
+  }
+
+  void initState() {
+    getthesharedpref();
+    super.initState();
+  }
+
+  getChatRoomIdbyUsername(String a, String b) {
+    if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
+      return "$b\_$a";
+    } else {
+      return "$a\_$b";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
