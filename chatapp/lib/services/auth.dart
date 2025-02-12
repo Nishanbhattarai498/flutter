@@ -30,13 +30,13 @@ class AuthMethods {
 
     User? userDetails = result.user;
     String username = userDetails!.email!.replaceAll("@gmail.com", "");
-    String firstletter = username.substring(0,1).toUpperCase();
-    await SharedPreferenceHelper().saveUserDisplayName(userDetails.displayName!);
+    String firstletter = username.substring(0, 1).toUpperCase();
+    await SharedPreferenceHelper()
+        .saveUserDisplayName(userDetails.displayName!);
     await SharedPreferenceHelper().saveUserEmail(userDetails.email!);
     await SharedPreferenceHelper().saveUserName(userDetails.uid);
     await SharedPreferenceHelper().saveUserDisplayName(username);
     await SharedPreferenceHelper().saveUserImage(userDetails.photoURL!);
-
 
     if (result != null) {
       Map<String, dynamic> userInfoMap = {
@@ -44,8 +44,8 @@ class AuthMethods {
         "Email": userDetails!.email,
         "Image": userDetails.photoURL,
         "Id": userDetails.uid,
-        "username":username.toUpperCase(),
-        "SearchKey":
+        "username": username.toUpperCase(),
+        "SearchKey": firstletter,
       };
 
       await DatabaseMethods()
