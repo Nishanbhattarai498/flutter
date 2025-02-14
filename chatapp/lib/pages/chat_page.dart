@@ -14,6 +14,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  Stream<QuerySnapshot>? messageStream;
   String? myUsername, myEmail, myName, mypicture, chatRoomId, messageId;
   TextEditingController messageController = TextEditingController();
 
@@ -27,10 +28,77 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {});
   }
 
+  ontheload() async {
+    await getthesharedpref();
+    await getandsetmessages();
+    setState(() {});
+  }
+
   @override
   void initState() {
-    getthesharedpref();
+    ontheload();
     super.initState();
+  }
+
+  Widget chatMessageTile(String message, bool sendByMe) {
+    return Row(
+      mainAxisAlignment:
+          sendByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+      children: [
+        Flexible(
+            child: Container(
+          padding: EdgeInsets.all(16),
+          margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(23),
+              bottomRight: sendByMe ? Radius.circular(0) : Radius.circular(23),
+              topRight: Radius.circular(23),
+              bottomLeft: sendByMe ? Radius.circular(23) : Radius.circular(0),
+            ),
+            color: sendByMe ? Colors.black45 : Colors.blue,
+          ),
+          child: Text(message,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              )),
+        ))
+      ],
+    );
+  }
+
+  getandsetmessages() async {
+    messageStream = DatabaseMethods().getChatRoomMessages(chatRoomId!);
+    setState(() {});
+  }
+
+  Widget chatMessage() {
+    return StreamBuilder(
+      stream: messageStream,
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(child: Text("No messages"));
+        } else {
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            reverse: true,
+            itemBuilder: (context, index) {
+              DocumentSnapshot ds = snapshot.data!.docs[index];
+              return chatMessageTile(
+                ds["message"],
+                myUsername == ds["sendBy"],
+              );
+            },
+          );
+        }
+      },
+    );
   }
 
   getChatRoomIdbyUsername(String a, String b) {
@@ -77,8 +145,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xff703eff),
-      body: Container(
-        margin: EdgeInsets.only(top: 40.0),
+      body: SafeArea(
         child: Column(
           children: [
             Padding(
@@ -98,7 +165,7 @@ class _ChatPageState extends State<ChatPage> {
                     width: MediaQuery.of(context).size.width / 5,
                   ),
                   Text(
-                    'Nishan Bhattarai',
+                    widget.name!, //name
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
@@ -128,61 +195,12 @@ class _ChatPageState extends State<ChatPage> {
                     SizedBox(
                       height: 50.0,
                     ),
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(13.0),
-                          decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(30),
-                                  topRight: Radius.circular(30),
-                                  bottomRight: Radius.circular(30))),
-                          child: Text(
-                            'Hey  how are you?',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(right: 20.0),
-                          padding: EdgeInsets.all(13.0),
-                          decoration: BoxDecoration(
-                            color: Colors.black45,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(30),
-                              topRight: Radius.circular(30),
-                              bottomLeft: Radius.circular(30),
-                            ),
-                          ),
-                          child: Text(
-                            'I am fine!',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height / 1.7,
+                    Expanded(
+                      child: chatMessage(),
                     ),
                     Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                       child: Row(
                         children: [
                           Container(
@@ -209,7 +227,7 @@ class _ChatPageState extends State<ChatPage> {
                                 controller: messageController,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: "Write a messege",
+                                  hintText: "Write a message",
                                   suffixIcon: Icon(Icons.attach_file),
                                 ),
                               ),
@@ -218,15 +236,20 @@ class _ChatPageState extends State<ChatPage> {
                           SizedBox(
                             width: 10.0,
                           ),
-                          Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                color: Color(0xff703eff),
-                                borderRadius: BorderRadius.circular(60)),
-                            child: Icon(
-                              Icons.send,
-                              size: 30.0,
-                              color: Colors.white,
+                          GestureDetector(
+                            onTap: () {
+                              addmessage(true);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: Color(0xff703eff),
+                                  borderRadius: BorderRadius.circular(60)),
+                              child: Icon(
+                                Icons.send,
+                                size: 30.0,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                           SizedBox(
@@ -234,11 +257,11 @@ class _ChatPageState extends State<ChatPage> {
                           ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

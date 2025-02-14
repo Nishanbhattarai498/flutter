@@ -1,4 +1,6 @@
+import 'package:chatapp/pages/chat_page.dart';
 import 'package:chatapp/services/database.dart';
+import 'package:chatapp/services/shared_pref.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -10,11 +12,28 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  TextEditingController searchController = new TextEditingController();
+  String? myUsername, myEmail, myName, mypicture, chatRoomId;
+  TextEditingController searchController = TextEditingController();
   bool search = false;
 
   var queryResultSet = [];
   var tempSearchStore = [];
+
+  @override
+  void initState() {
+    getthesharedpref();
+    super.initState();
+  }
+
+  getthesharedpref() async {
+    myUsername = await SharedPreferenceHelper().getUserName();
+    myEmail = await SharedPreferenceHelper().getUserEmail();
+    myName = await SharedPreferenceHelper().getUserDisplayName();
+    mypicture = await SharedPreferenceHelper().getUserImage();
+
+    setState(() {});
+  }
+
   getChatRoomIdbyUsername(String a, String b) {
     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
       return "${b}_$a";
@@ -181,76 +200,143 @@ class _HomeState extends State<Home> {
                     SizedBox(
                       height: 20.0,
                     ),
-                    Material(
-                      elevation: 3.0,
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        width: MediaQuery.of(context).size.width,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(60),
-                              child: Image.asset(
-                                'images/boy.jpg',
-                                height: 65,
-                                width: 65,
-                                fit: BoxFit.cover,
+                    search
+                        ? ListView(
+                            padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                            primary: false,
+                            shrinkWrap: true,
+                            children: tempSearchStore.map((element) {
+                              return buildResultCard(element);
+                            }).toList(),
+                          )
+                        : Material(
+                            elevation: 3.0,
+                            borderRadius: BorderRadius.circular(20),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              width: MediaQuery.of(context).size.width,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(60),
+                                    child: Image.asset(
+                                      'images/boy.jpg',
+                                      height: 65,
+                                      width: 65,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 10.0,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        height: 10.0,
+                                      ),
+                                      Text(
+                                        'Shyam123',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Hello,how are you?',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: const Color.fromARGB(
+                                              145, 0, 0, 0),
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Spacer(),
+                                  Text(
+                                    '02:00 PM',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            SizedBox(
-                              width: 10.0,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  height: 10.0,
-                                ),
-                                Text(
-                                  'Shyam123',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  'Hello,how are you?',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: const Color.fromARGB(145, 0, 0, 0),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Spacer(),
-                            Text(
-                              '02:00 PM',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
+                          )
                   ],
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildResultCard(data) {
+    return GestureDetector(
+      onTap: () async {
+        search = false;
+        chatRoomId = getChatRoomIdbyUsername(myUsername!, data['username']);
+        Map<String, dynamic> chatRoomInfoMap = {
+          "users": [myUsername, data['username']]
+        };
+        await DatabaseMethods().createChatRoom(chatRoomId!, chatRoomInfoMap);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ChatPage(
+                      name: data["Name"],
+                      profileUrl: data["Image"],
+                      username: data["username"],
+                    )));
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 8.0),
+        child: Material(
+          elevation: 5.0,
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            padding: EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(60),
+                  child: Image.network(
+                    data['Image'],
+                    height: 70,
+                    width: 70,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(data['username'], style: TextStyle(fontSize: 16)),
+                    Text(data['Name'], style: TextStyle(fontSize: 12)),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

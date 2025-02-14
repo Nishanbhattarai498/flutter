@@ -37,11 +37,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: ChatPage(
-        name: "",
-        profileUrl: "",
-        username: "",
-      ),
+      home: Home(),
     );
   }
 }

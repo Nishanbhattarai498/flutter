@@ -18,7 +18,7 @@ class DatabaseMethods {
   Future addMessage(String chatRoomId, String messageId,
       Map<String, dynamic> messageInfoMap) async {
     return await FirebaseFirestore.instance
-        .collection("chatrooms")
+        .collection("chatrooms") // Changed to lowercase
         .doc(chatRoomId)
         .collection("chats")
         .doc(messageId)
@@ -28,8 +28,33 @@ class DatabaseMethods {
   updateLastMessageSend(
       String chatRoomId, Map<String, dynamic> lastMessageInfoMap) async {
     return FirebaseFirestore.instance
-        .collection("Chatrooms")
+        .collection("chatrooms") // Changed to lowercase
         .doc(chatRoomId)
         .update(lastMessageInfoMap);
+  }
+
+  createChatRoom(
+      String chatRoomId, Map<String, dynamic> chatRoomInfoMap) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection("chatrooms") // Changed to lowercase
+        .doc(chatRoomId)
+        .get();
+    if (snapshot.exists) {
+      return true;
+    } else {
+      return FirebaseFirestore.instance
+          .collection("chatrooms") // Changed to lowercase
+          .doc(chatRoomId)
+          .set(chatRoomInfoMap);
+    }
+  }
+
+  Stream<QuerySnapshot> getChatRoomMessages(String chatRoomId) {
+    return FirebaseFirestore.instance
+        .collection("chatrooms") // Changed to lowercase
+        .doc(chatRoomId)
+        .collection("chats")
+        .orderBy("time", descending: true)
+        .snapshots();
   }
 }
