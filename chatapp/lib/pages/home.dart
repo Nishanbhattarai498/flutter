@@ -338,8 +338,13 @@ class _HomeState extends State<Home> {
 class ChatroomTile extends StatefulWidget {
   final String? lastMessage, chatRoomId, id, myUsername, time;
 
-  ChatroomTile(
-      {this.lastMessage, this.chatRoomId, this.id, this.myUsername, this.time});
+  const ChatroomTile(
+      {super.key,
+      this.lastMessage,
+      this.chatRoomId,
+      this.id,
+      this.myUsername,
+      this.time});
 
   @override
   State<ChatroomTile> createState() => _ChatroomTileState();

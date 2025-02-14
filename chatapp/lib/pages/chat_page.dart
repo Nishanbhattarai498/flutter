@@ -7,7 +7,7 @@ import 'package:random_string/random_string.dart';
 
 class ChatPage extends StatefulWidget {
   final String? name, profileUrl, username;
-  ChatPage({super.key, this.name, this.profileUrl, this.username});
+  const ChatPage({super.key, this.name, this.profileUrl, this.username});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
