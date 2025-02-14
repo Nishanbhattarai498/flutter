@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:random_string/random_string.dart';
 
 class ChatPage extends StatefulWidget {
-  String? name, profileUrl, username;
+  final String? name, profileUrl, username;
   ChatPage({super.key, this.name, this.profileUrl, this.username});
 
   @override
@@ -23,7 +23,9 @@ class _ChatPageState extends State<ChatPage> {
     myEmail = await SharedPreferenceHelper().getUserEmail();
     myName = await SharedPreferenceHelper().getUserDisplayName();
     mypicture = await SharedPreferenceHelper().getUserImage();
-    chatRoomId = getChatRoomIdbyUsername(widget.username!, myUsername!);
+    if (widget.username != null && myUsername != null) {
+      chatRoomId = getChatRoomIdbyUsername(widget.username!, myUsername!);
+    }
 
     setState(() {});
   }
@@ -70,8 +72,10 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   getandsetmessages() async {
-    messageStream = DatabaseMethods().getChatRoomMessages(chatRoomId!);
-    setState(() {});
+    if (chatRoomId != null) {
+      messageStream = DatabaseMethods().getChatRoomMessages(chatRoomId!);
+      setState(() {});
+    }
   }
 
   Widget chatMessage() {
@@ -165,7 +169,7 @@ class _ChatPageState extends State<ChatPage> {
                     width: MediaQuery.of(context).size.width / 5,
                   ),
                   Text(
-                    widget.name!, //name
+                    widget.name ?? '', //name
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,

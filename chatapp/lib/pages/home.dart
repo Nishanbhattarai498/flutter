@@ -1,4 +1,5 @@
 import 'package:chatapp/pages/chat_page.dart';
+import 'package:chatapp/pages/profile.dart'; // Import the profile page
 import 'package:chatapp/services/database.dart';
 import 'package:chatapp/services/shared_pref.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,7 +13,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  Stream? chatRoomsStream;
+  Stream<QuerySnapshot>? chatRoomsStream;
 
   String? myUsername, myEmail, myName, mypicture, chatRoomId;
   TextEditingController searchController = TextEditingController();
@@ -32,7 +33,7 @@ class _HomeState extends State<Home> {
 
   ontheload() async {
     await getthesharedpref();
-    chatRoomsStream = await DatabaseMethods().getChatRooms();
+    chatRoomsStream = DatabaseMethods().getChatRooms();
     setState(() {});
   }
 
@@ -45,22 +46,30 @@ class _HomeState extends State<Home> {
   Widget chatRoomList() {
     return StreamBuilder(
       stream: chatRoomsStream,
-      builder: (context, AsyncSnapshot snapshot) {
-        return snapshot.hasData
-            ? ListView.builder(
-                padding: EdgeInsets.zero,
-                itemCount: snapshot.data.docs.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot ds = snapshot.data.docs[index];
-                  return ChatroomTile(
-                      chatRoomId: ds.id,
-                      lastMessage: ds["lastMessage"],
-                      myUsername: myUsername,
-                      time: ds["lastMessageSendTs"]);
-                })
-            : Container();
-      }, // StreamBuilder
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(child: Text("No chat rooms"));
+        } else {
+          return ListView.builder(
+            padding: EdgeInsets.zero,
+            itemCount: snapshot.data!.docs.length,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              DocumentSnapshot ds = snapshot.data!.docs[index];
+              return ChatroomTile(
+                chatRoomId: ds.id,
+                lastMessage: ds["lastMessage"],
+                myUsername: myUsername,
+                time: ds["lastMessageSendTs"],
+              );
+            },
+          );
+        }
+      },
     );
   }
 
@@ -136,7 +145,7 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Text(
-                    myName!,
+                    myName ?? '',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
@@ -145,19 +154,38 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Spacer(),
-                  Container(
-                    padding: EdgeInsets.all(5.0),
-                    margin: EdgeInsets.only(right: 20.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10.0),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProfileScreen()),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(5.0),
+                      margin: EdgeInsets.only(right: 20.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: mypicture != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(60),
+                              child: Image.network(
+                                mypicture!,
+                                height: 30,
+                                width: 30,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : Icon(
+                              Icons.person,
+                              color: Color(0xff703eff),
+                              size: 30.0,
+                            ),
                     ),
-                    child: Icon(
-                      Icons.person,
-                      color: Color(0xff703eff),
-                      size: 30.0,
-                    ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -308,7 +336,7 @@ class _HomeState extends State<Home> {
 }
 
 class ChatroomTile extends StatefulWidget {
-  String? lastMessage, chatRoomId, id, myUsername, time;
+  final String? lastMessage, chatRoomId, id, myUsername, time;
 
   ChatroomTile(
       {this.lastMessage, this.chatRoomId, this.id, this.myUsername, this.time});
@@ -321,15 +349,20 @@ class _ChatroomTileState extends State<ChatroomTile> {
   String profilePicUrl = "", name = "", username = "", id = "";
 
   getthisUserInfo() async {
-    username = widget.chatRoomId!
-        .replaceAll("_", "")
-        .replaceAll(widget.myUsername!, "");
-    QuerySnapshot querySnapshot = await DatabaseMethods().getUserInfo(username);
+    if (widget.chatRoomId != null && widget.myUsername != null) {
+      username = widget.chatRoomId!
+          .replaceAll("_", "")
+          .replaceAll(widget.myUsername!, "");
+      QuerySnapshot querySnapshot =
+          await DatabaseMethods().getUserInfo(username);
 
-    name = "${querySnapshot.docs[0]["Name"]}";
-    profilePicUrl = "${querySnapshot.docs[0]["Image"]}";
-    id = "${querySnapshot.docs[0]["username"]}";
-    setState(() {});
+      if (querySnapshot.docs.isNotEmpty) {
+        name = "${querySnapshot.docs[0]["Name"]}";
+        profilePicUrl = "${querySnapshot.docs[0]["Image"]}";
+        id = "${querySnapshot.docs[0]["username"]}";
+      }
+      setState(() {});
+    }
   }
 
   @override
@@ -340,8 +373,18 @@ class _ChatroomTileState extends State<ChatroomTile> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Material(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ChatPage(
+                      name: name,
+                      profileUrl: profilePicUrl,
+                      username: username,
+                    )));
+      },
+      child: Material(
         elevation: 3.0,
         borderRadius: BorderRadius.circular(20),
         child: Container(
@@ -385,7 +428,7 @@ class _ChatroomTileState extends State<ChatroomTile> {
                     ),
                   ),
                   Text(
-                    widget.lastMessage!,
+                    widget.lastMessage ?? '',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: const Color.fromARGB(145, 0, 0, 0),
@@ -397,7 +440,7 @@ class _ChatroomTileState extends State<ChatroomTile> {
               ),
               Spacer(),
               Text(
-                widget.time!,
+                widget.time ?? '',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 18,

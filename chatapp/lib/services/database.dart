@@ -1,4 +1,3 @@
-import 'package:chatapp/services/shared_pref.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseMethods {
@@ -19,7 +18,7 @@ class DatabaseMethods {
   Future addMessage(String chatRoomId, String messageId,
       Map<String, dynamic> messageInfoMap) async {
     return await FirebaseFirestore.instance
-        .collection("chatrooms") // Changed to lowercase
+        .collection("chatrooms")
         .doc(chatRoomId)
         .collection("chats")
         .doc(messageId)
@@ -29,22 +28,20 @@ class DatabaseMethods {
   updateLastMessageSend(
       String chatRoomId, Map<String, dynamic> lastMessageInfoMap) async {
     return FirebaseFirestore.instance
-        .collection("chatrooms") // Changed to lowercase
+        .collection("chatrooms")
         .doc(chatRoomId)
         .update(lastMessageInfoMap);
   }
 
-  createChatRoom(
+  Future<void> createChatRoom(
       String chatRoomId, Map<String, dynamic> chatRoomInfoMap) async {
     final snapshot = await FirebaseFirestore.instance
-        .collection("chatrooms") // Changed to lowercase
+        .collection("chatrooms")
         .doc(chatRoomId)
         .get();
-    if (snapshot.exists) {
-      return true;
-    } else {
+    if (!snapshot.exists) {
       return FirebaseFirestore.instance
-          .collection("chatrooms") // Changed to lowercase
+          .collection("chatrooms")
           .doc(chatRoomId)
           .set(chatRoomInfoMap);
     }
@@ -52,11 +49,15 @@ class DatabaseMethods {
 
   Stream<QuerySnapshot> getChatRoomMessages(String chatRoomId) {
     return FirebaseFirestore.instance
-        .collection("chatrooms") // Changed to lowercase
+        .collection("chatrooms")
         .doc(chatRoomId)
         .collection("chats")
         .orderBy("time", descending: true)
         .snapshots();
+  }
+
+  Stream<QuerySnapshot> getChatRooms() {
+    return FirebaseFirestore.instance.collection("chatrooms").snapshots();
   }
 
   Future<QuerySnapshot> getUserInfo(String username) async {
@@ -66,12 +67,13 @@ class DatabaseMethods {
         .get();
   }
 
-  Future<Stream<QuerySnapshot>> getChatRooms() async {
-    String? myUsername = await SharedPreferenceHelper().getUserName();
-    return await FirebaseFirestore.instance
-        .collection("chatrooms") // Changed to lowercase
-        .orderBy("time", descending: true)
-        .where("users", arrayContains: myUsername)
-        .snapshots();
+  Future<void> deleteUserMessages(String userId) async {
+    QuerySnapshot chatRoomsSnapshot = await FirebaseFirestore.instance
+        .collection('chatrooms')
+        .where('users', arrayContains: userId)
+        .get();
+    for (var doc in chatRoomsSnapshot.docs) {
+      await doc.reference.delete();
+    }
   }
 }
