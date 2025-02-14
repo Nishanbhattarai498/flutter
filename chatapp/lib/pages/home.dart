@@ -12,18 +12,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Stream? chatRoomsStream;
+
   String? myUsername, myEmail, myName, mypicture, chatRoomId;
   TextEditingController searchController = TextEditingController();
   bool search = false;
 
   var queryResultSet = [];
   var tempSearchStore = [];
-
-  @override
-  void initState() {
-    getthesharedpref();
-    super.initState();
-  }
 
   getthesharedpref() async {
     myUsername = await SharedPreferenceHelper().getUserName();
@@ -32,6 +28,40 @@ class _HomeState extends State<Home> {
     mypicture = await SharedPreferenceHelper().getUserImage();
 
     setState(() {});
+  }
+
+  ontheload() async {
+    await getthesharedpref();
+    chatRoomsStream = await DatabaseMethods().getChatRooms();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    ontheload();
+    super.initState();
+  }
+
+  Widget chatRoomList() {
+    return StreamBuilder(
+      stream: chatRoomsStream,
+      builder: (context, AsyncSnapshot snapshot) {
+        return snapshot.hasData
+            ? ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: snapshot.data.docs.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  DocumentSnapshot ds = snapshot.data.docs[index];
+                  return ChatroomTile(
+                      chatRoomId: ds.id,
+                      lastMessage: ds["lastMessage"],
+                      myUsername: myUsername,
+                      time: ds["lastMessageSendTs"]);
+                })
+            : Container();
+      }, // StreamBuilder
+    );
   }
 
   getChatRoomIdbyUsername(String a, String b) {
@@ -65,13 +95,13 @@ class _HomeState extends State<Home> {
       });
     } else {
       tempSearchStore = [];
-      queryResultSet.forEach((element) {
+      for (var element in queryResultSet) {
         if (element['username'].startsWith(capitalizedValue)) {
           setState(() {
             tempSearchStore.add(element);
           });
         }
-      });
+      }
     }
   }
 
@@ -97,7 +127,7 @@ class _HomeState extends State<Home> {
                     width: 10.0,
                   ),
                   Text(
-                    'Hello,',
+                    'Hello, ',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
@@ -106,7 +136,7 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Text(
-                    'Nishan',
+                    myName!,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
@@ -209,73 +239,7 @@ class _HomeState extends State<Home> {
                               return buildResultCard(element);
                             }).toList(),
                           )
-                        : Material(
-                            elevation: 3.0,
-                            borderRadius: BorderRadius.circular(20),
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              width: MediaQuery.of(context).size.width,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(60),
-                                    child: Image.asset(
-                                      'images/boy.jpg',
-                                      height: 65,
-                                      width: 65,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 10.0,
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        height: 10.0,
-                                      ),
-                                      Text(
-                                        'Shyam123',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      Text(
-                                        'Hello,how are you?',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: const Color.fromARGB(
-                                              145, 0, 0, 0),
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Spacer(),
-                                  Text(
-                                    '02:00 PM',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
+                        : chatRoomList(),
                   ],
                 ),
               ),
@@ -336,6 +300,111 @@ class _HomeState extends State<Home> {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ChatroomTile extends StatefulWidget {
+  String? lastMessage, chatRoomId, id, myUsername, time;
+
+  ChatroomTile(
+      {this.lastMessage, this.chatRoomId, this.id, this.myUsername, this.time});
+
+  @override
+  State<ChatroomTile> createState() => _ChatroomTileState();
+}
+
+class _ChatroomTileState extends State<ChatroomTile> {
+  String profilePicUrl = "", name = "", username = "", id = "";
+
+  getthisUserInfo() async {
+    username = widget.chatRoomId!
+        .replaceAll("_", "")
+        .replaceAll(widget.myUsername!, "");
+    QuerySnapshot querySnapshot = await DatabaseMethods().getUserInfo(username);
+
+    name = "${querySnapshot.docs[0]["Name"]}";
+    profilePicUrl = "${querySnapshot.docs[0]["Image"]}";
+    id = "${querySnapshot.docs[0]["username"]}";
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    getthisUserInfo();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Material(
+        elevation: 3.0,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          width: MediaQuery.of(context).size.width,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              profilePicUrl == ""
+                  ? CircularProgressIndicator()
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(60),
+                      child: Image.network(
+                        profilePicUrl,
+                        height: 65,
+                        width: 65,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+              SizedBox(
+                width: 10.0,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  Text(
+                    name,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    widget.lastMessage!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: const Color.fromARGB(145, 0, 0, 0),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              Spacer(),
+              Text(
+                widget.time!,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ),
       ),
