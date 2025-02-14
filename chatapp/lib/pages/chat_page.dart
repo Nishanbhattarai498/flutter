@@ -42,31 +42,49 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
   }
 
-  Widget chatMessageTile(String message, bool sendByMe) {
-    return Row(
-      mainAxisAlignment:
-          sendByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+  Widget chatMessageTile(String message, String time, bool sendByMe) {
+    return Column(
+      crossAxisAlignment:
+          sendByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
-        Flexible(
-            child: Container(
-          padding: EdgeInsets.all(16),
-          margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(23),
-              bottomRight: sendByMe ? Radius.circular(0) : Radius.circular(23),
-              topRight: Radius.circular(23),
-              bottomLeft: sendByMe ? Radius.circular(23) : Radius.circular(0),
+        Row(
+          mainAxisAlignment:
+              sendByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          children: [
+            Flexible(
+                child: Container(
+              padding: EdgeInsets.all(16),
+              margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(23),
+                  bottomRight:
+                      sendByMe ? Radius.circular(0) : Radius.circular(23),
+                  topRight: Radius.circular(23),
+                  bottomLeft:
+                      sendByMe ? Radius.circular(23) : Radius.circular(0),
+                ),
+                color: sendByMe ? Colors.black45 : Colors.blue,
+              ),
+              child: Text(message,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  )),
+            ))
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+          child: Text(
+            time,
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 12,
             ),
-            color: sendByMe ? Colors.black45 : Colors.blue,
           ),
-          child: Text(message,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              )),
-        ))
+        ),
       ],
     );
   }
@@ -96,6 +114,7 @@ class _ChatPageState extends State<ChatPage> {
               DocumentSnapshot ds = snapshot.data!.docs[index];
               return chatMessageTile(
                 ds["message"],
+                ds["ts"],
                 myUsername == ds["sendBy"],
               );
             },

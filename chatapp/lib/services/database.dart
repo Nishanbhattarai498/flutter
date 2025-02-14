@@ -56,8 +56,11 @@ class DatabaseMethods {
         .snapshots();
   }
 
-  Stream<QuerySnapshot> getChatRooms() {
-    return FirebaseFirestore.instance.collection("chatrooms").snapshots();
+  Stream<QuerySnapshot> getUserChatRooms(String username) {
+    return FirebaseFirestore.instance
+        .collection("chatrooms")
+        .where('users', arrayContains: username)
+        .snapshots();
   }
 
   Future<QuerySnapshot> getUserInfo(String username) async {

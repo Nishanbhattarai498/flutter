@@ -33,7 +33,7 @@ class _HomeState extends State<Home> {
 
   ontheload() async {
     await getthesharedpref();
-    chatRoomsStream = DatabaseMethods().getChatRooms();
+    chatRoomsStream = DatabaseMethods().getUserChatRooms(myUsername!);
     setState(() {});
   }
 
@@ -60,11 +60,16 @@ class _HomeState extends State<Home> {
             shrinkWrap: true,
             itemBuilder: (context, index) {
               DocumentSnapshot ds = snapshot.data!.docs[index];
-              return ChatroomTile(
-                chatRoomId: ds.id,
-                lastMessage: ds["lastMessage"],
-                myUsername: myUsername,
-                time: ds["lastMessageSendTs"],
+              return Column(
+                children: [
+                  ChatroomTile(
+                    chatRoomId: ds.id,
+                    lastMessage: ds["lastMessage"],
+                    myUsername: myUsername,
+                    time: ds["lastMessageSendTs"],
+                  ),
+                  SizedBox(height: 10), // Add gap between chat rooms
+                ],
               );
             },
           );
@@ -167,15 +172,22 @@ class _HomeState extends State<Home> {
                       margin: EdgeInsets.only(right: 20.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(10.0),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
                       ),
                       child: mypicture != null
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(60),
+                          ? ClipOval(
                               child: Image.network(
                                 mypicture!,
-                                height: 30,
-                                width: 30,
+                                height: 40,
+                                width: 40,
                                 fit: BoxFit.cover,
                               ),
                             )
