@@ -1,4 +1,5 @@
 import 'package:chatapp/pages/chat_page.dart';
+import 'package:chatapp/pages/home.dart';
 import 'package:chatapp/pages/onboarding.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

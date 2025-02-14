@@ -9,7 +9,7 @@ class AuthMethods {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
   getCurrentUser() async {
-    return await auth.currentUser;
+    return auth.currentUser;
   }
 
   signInWithGoogle(BuildContext context) async {
@@ -39,32 +39,28 @@ class AuthMethods {
     await SharedPreferenceHelper().saveUserDisplayName(username);
     await SharedPreferenceHelper().saveUserImage(userDetails.photoURL!);
 
-    if (result != null) {
-      Map<String, dynamic> userInfoMap = {
-        "Name": userDetails.displayName,
-        "Email": userDetails.email,
-        "Image": userDetails.photoURL,
-        "Id": userDetails.uid,
-        "username": username.toUpperCase(),
-        "SearchKey": firstletter,
-      };
+    Map<String, dynamic> userInfoMap = {
+      "Name": userDetails.displayName,
+      "Email": userDetails.email,
+      "Image": userDetails.photoURL,
+      "Id": userDetails.uid,
+      "username": username.toUpperCase(),
+      "SearchKey": firstletter,
+    };
 
-      await DatabaseMethods()
-          .addUser(userInfoMap, userDetails.uid)
-          .then((value) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.green,
-            content: Text(
-              "Registered successfully!",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22.0,
-                  fontWeight: FontWeight.bold),
-            )));
+    await DatabaseMethods().addUser(userInfoMap, userDetails.uid).then((value) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green,
+          content: Text(
+            "Registered successfully!",
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 22.0,
+                fontWeight: FontWeight.bold),
+          )));
 
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Home()));
-      });
-    }
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => Home()));
+    });
   }
 }

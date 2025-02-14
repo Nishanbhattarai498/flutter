@@ -1,3 +1,4 @@
+import 'package:chatapp/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/services/shared_pref.dart';
@@ -6,7 +7,7 @@ import 'package:random_string/random_string.dart';
 
 class ChatPage extends StatefulWidget {
   String? name, profileUrl, username;
-  ChatPage({this.name, this.profileUrl, this.username});
+  ChatPage({super.key, this.name, this.profileUrl, this.username});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -14,7 +15,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   String? myUsername, myEmail, myName, mypicture, chatRoomId, messageId;
-  TextEditingController messageController = new TextEditingController();
+  TextEditingController messageController = TextEditingController();
 
   getthesharedpref() async {
     myUsername = await SharedPreferenceHelper().getUserName();
@@ -26,6 +27,7 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {});
   }
 
+  @override
   void initState() {
     getthesharedpref();
     super.initState();
@@ -33,13 +35,13 @@ class _ChatPageState extends State<ChatPage> {
 
   getChatRoomIdbyUsername(String a, String b) {
     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
-      return "$b\_$a";
+      return "${b}_$a";
     } else {
-      return "$a\_$b";
+      return "${a}_$b";
     }
   }
 
-  addmessage(bool sendClicked) {
+  addmessage(bool sendClicked) async {
     if (messageController.text != "") {
       String message = messageController.text;
       messageController.text = "";
@@ -53,7 +55,21 @@ class _ChatPageState extends State<ChatPage> {
         "time": FieldValue.serverTimestamp(),
         "imageUrl": mypicture,
       };
-      messageId = randomAlphaNumeric(12);
+      messageId = randomAlphaNumeric(10);
+      await DatabaseMethods()
+          .addMessage(chatRoomId!, messageId!, messageInfoMap)
+          .then((value) {
+        Map<String, dynamic> lastMessageInfoMap = {
+          "lastMessage": message,
+          "lastMessageSendTs": formattedDate,
+          "lastMessageSendBy": myUsername,
+        };
+        DatabaseMethods()
+            .updateLastMessageSend(chatRoomId!, lastMessageInfoMap);
+        if (sendClicked) {
+          message = "";
+        }
+      });
     }
   }
 
