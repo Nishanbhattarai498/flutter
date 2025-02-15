@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         colorScheme: const ColorScheme.dark(
           primary: Color(0xFF6C63FF),
           secondary: Color(0xFF8A84FF),
-          background: Color(0xFF0B0D1C),
+          surface: Color(0xFF0B0D1C),
         ),
         textTheme: const TextTheme(
           displayLarge: TextStyle(
@@ -100,6 +100,8 @@ class MyHomePage extends StatelessWidget {
       'description': 'The farthest planet from the sun.'
     },
   ];
+
+  const MyHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {

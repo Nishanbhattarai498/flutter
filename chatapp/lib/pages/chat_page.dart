@@ -155,8 +155,10 @@ class _ChatPageState extends State<ChatPage> {
           "lastMessageSendTs": formattedDate,
           "lastMessageSendBy": myUsername,
         };
-        DatabaseMethods()
-            .updateLastMessageSend(chatRoomId!, lastMessageInfoMap);
+        if (message.isNotEmpty) {
+          DatabaseMethods()
+              .updateLastMessageSend(chatRoomId!, lastMessageInfoMap);
+        }
         if (sendClicked) {
           message = "";
         }

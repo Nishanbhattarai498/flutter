@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:chatapp/services/shared_pref.dart';
 import 'package:chatapp/pages/onboarding.dart';
 import 'package:chatapp/services/database.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 void main() {
   runApp(const MyApp());
@@ -145,6 +146,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _logout() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    await googleSignIn.signOut();
     await _auth.signOut();
     await SharedPreferenceHelper().clear();
     Navigator.pushReplacement(

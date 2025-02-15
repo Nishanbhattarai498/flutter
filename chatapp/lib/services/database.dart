@@ -30,7 +30,10 @@ class DatabaseMethods {
     return FirebaseFirestore.instance
         .collection("chatrooms")
         .doc(chatRoomId)
-        .update(lastMessageInfoMap);
+        .update({
+      'lastMessage': lastMessageInfoMap['lastMessage'],
+      'lastMessageSendTs': lastMessageInfoMap['lastMessageSendTs'],
+    });
   }
 
   Future<void> createChatRoom(

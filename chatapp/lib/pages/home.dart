@@ -64,9 +64,18 @@ class _HomeState extends State<Home> {
                 children: [
                   ChatroomTile(
                     chatRoomId: ds.id,
-                    lastMessage: ds["lastMessage"],
+                    lastMessage: ds.data() != null &&
+                            (ds.data() as Map<String, dynamic>)
+                                .containsKey('lastMessage')
+                        ? ds['lastMessage']
+                        : '',
                     myUsername: myUsername,
-                    time: ds["lastMessageSendTs"],
+                    time: ds.data() != null &&
+                            (ds.data() as Map<String, dynamic>)
+                                .containsKey('lastMessageSendTs')
+                        ? (ds.data()
+                            as Map<String, dynamic>)['lastMessageSendTs']
+                        : '',
                   ),
                   SizedBox(height: 10), // Add gap between chat rooms
                 ],

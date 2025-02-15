@@ -4,18 +4,17 @@ import 'package:chatapp/services/shared_pref.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class AuthMethods {
   final FirebaseAuth auth = FirebaseAuth.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
 
   getCurrentUser() async {
     return auth.currentUser;
   }
 
   signInWithGoogle(BuildContext context) async {
-    final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-
     final GoogleSignInAccount? googleSignInAccount =
         await googleSignIn.signIn();
 
@@ -27,7 +26,7 @@ class AuthMethods {
       accessToken: googleSignInAuthentication?.accessToken,
     );
 
-    UserCredential result = await firebaseAuth.signInWithCredential(credential);
+    UserCredential result = await auth.signInWithCredential(credential);
 
     User? userDetails = result.user;
     String username = userDetails!.email!.replaceAll("@gmail.com", "");
@@ -38,6 +37,8 @@ class AuthMethods {
     await SharedPreferenceHelper().saveUserName(userDetails.uid);
     await SharedPreferenceHelper().saveUserDisplayName(username);
     await SharedPreferenceHelper().saveUserImage(userDetails.photoURL!);
+
+    await FirebaseMessaging.instance.requestPermission();
 
     Map<String, dynamic> userInfoMap = {
       "Name": userDetails.displayName,
