@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cosmicapp/screens/login_screen.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -31,46 +32,65 @@ class _SplashScreenState extends State<SplashScreen> {
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: NetworkImage(
-                'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-15%20113953-n1KU3kwCRWwbiFga25fAryiTq2vFQY.png'),
+              'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986',
+            ),
             fit: BoxFit.cover,
           ),
         ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.5),
-                    width: 2,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black.withOpacity(0.7),
+                Colors.black.withOpacity(0.3),
+              ],
+            ),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Theme.of(context).primaryColor,
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).primaryColor.withOpacity(0.5),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                      ),
+                    ],
                   ),
-                ),
-                child: const Center(
-                  child: Text(
-                    'cosmic',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
+                  child: const Center(
+                    child: Text(
+                      'cosmic',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'The Final Space Journey',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 100),
-              const FlutterLogo(size: 30),
-            ],
+                ).animate().fadeIn(duration: 600.ms).scale(delay: 200.ms),
+                const SizedBox(height: 20),
+                const Text(
+                  'Explore The Universe',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
+              ],
+            ),
           ),
         ),
       ),

@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:cosmicapp/providers/planet_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class PlanetCard extends StatelessWidget {
-  final String name;
-  final String description;
-  final String imageUrl;
+  final Planet planet;
   final VoidCallback onTap;
 
   const PlanetCard({
     super.key,
-    required this.name,
-    required this.description,
-    required this.imageUrl,
+    required this.planet,
     required this.onTap,
   });
 
@@ -24,22 +22,28 @@ class PlanetCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.1),
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.2),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(15),
-              child: Image.network(
-                imageUrl,
+              child: CachedNetworkImage(
+                imageUrl: planet.imageUrl,
                 height: 100,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                placeholder: (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
             ),
             const SizedBox(height: 12),
             Text(
-              name,
+              planet.name,
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -47,11 +51,13 @@ class PlanetCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              description,
+              planet.description,
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey.shade400,
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

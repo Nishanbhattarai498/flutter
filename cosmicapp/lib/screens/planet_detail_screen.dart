@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:cosmicapp/providers/planet_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
 
 class PlanetDetailScreen extends StatelessWidget {
-  final String planetName;
+  final Planet planet;
 
-  const PlanetDetailScreen({
-    super.key,
-    required this.planetName,
-  });
+  const PlanetDetailScreen({super.key, required this.planet});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              const Color(0xFF0B0D1C),
-              Colors.indigo.shade900,
-            ],
+          image: DecorationImage(
+            image: CachedNetworkImageProvider(planet.imageUrl),
+            fit: BoxFit.cover,
           ),
         ),
         child: SafeArea(
@@ -35,9 +31,19 @@ class PlanetDetailScreen extends StatelessWidget {
                       icon: const Icon(Icons.arrow_back),
                       onPressed: () => Navigator.pop(context),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.favorite_border),
-                      onPressed: () {},
+                    Consumer<PlanetProvider>(
+                      builder: (context, provider, child) {
+                        return IconButton(
+                          icon: Icon(
+                            planet.isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color:
+                                planet.isFavorite ? Colors.red : Colors.white,
+                          ),
+                          onPressed: () => provider.toggleFavorite(planet.id),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -47,33 +53,24 @@ class PlanetDetailScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Center(
-                        child: Image.network(
-                          'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-15%20113953-n1KU3kwCRWwbiFga25fAryiTq2vFQY.png',
-                          height: 200,
-                          width: 200,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              planetName,
-                              style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              planet.name,
+                              style: Theme.of(context).textTheme.displayLarge,
                             ),
-                            const SizedBox(height: 16),
-                            const Text(
+                            const SizedBox(height: 8),
+                            Text(
+                              planet.description,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                            const SizedBox(height: 24),
+                            Text(
                               'Planet Statistics',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: Theme.of(context).textTheme.titleLarge,
                             ),
                             const SizedBox(height: 16),
                             GridView.count(
@@ -81,11 +78,10 @@ class PlanetDetailScreen extends StatelessWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               crossAxisCount: 3,
                               childAspectRatio: 1.5,
-                              children: [
-                                _buildStatCard('Mass', '5.97', 'x10²⁴ kg'),
-                                _buildStatCard('Gravity', '9.8', 'm/s²'),
-                                _buildStatCard('Radius', '6371', 'km'),
-                              ],
+                              children: planet.stats.entries.map((entry) {
+                                return _buildStatCard(
+                                    context, entry.key, entry.value);
+                              }).toList(),
                             ),
                           ],
                         ),
@@ -101,22 +97,25 @@ class PlanetDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(String label, String value, String unit) {
+  Widget _buildStatCard(BuildContext context, String label, String value) {
     return Container(
       margin: const EdgeInsets.all(4),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.2),
+        ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: Colors.grey,
+              color: Colors.grey.shade300,
             ),
           ),
           const SizedBox(height: 4),
@@ -126,13 +125,7 @@ class PlanetDetailScreen extends StatelessWidget {
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
-          ),
-          Text(
-            unit,
-            style: const TextStyle(
-              fontSize: 10,
-              color: Colors.grey,
-            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

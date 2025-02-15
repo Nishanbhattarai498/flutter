@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:cosmicapp/providers/planet_provider.dart';
 import 'package:cosmicapp/widgets/planet_card.dart';
 import 'package:cosmicapp/screens/planet_detail_screen.dart';
+import 'package:cosmicapp/screens/favorites_screen.dart';
+import 'package:cosmicapp/screens/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final planetProvider = Provider.of<PlanetProvider>(context);
+
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              const Color(0xFF0B0D1C),
-              Colors.indigo.shade900,
-            ],
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: NetworkImage(
+                'https://images.unsplash.com/photo-1506318137071-a8e063b4bec0'),
+            fit: BoxFit.cover,
           ),
         ),
         child: SafeArea(
@@ -28,12 +31,9 @@ class HomeScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Solar System',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).textTheme.displayMedium,
                     ),
                     IconButton(
                       icon: const Icon(Icons.settings),
@@ -46,53 +46,74 @@ class HomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
                   'Planet of the day',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.blue.shade200,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
                 ),
               ),
               const SizedBox(height: 16),
               SizedBox(
-                height: 200,
-                child: ListView(
+                height: 220,
+                child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  children: [
-                    PlanetCard(
-                      name: 'Mars',
-                      description: 'The red planet',
-                      imageUrl:
-                          'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-15%20113953-n1KU3kwCRWwbiFga25fAryiTq2vFQY.png',
+                  itemCount: planetProvider.planets.length,
+                  itemBuilder: (context, index) {
+                    final planet = planetProvider.planets[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 16),
+                      child: PlanetCard(
+                        planet: planet,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  PlanetDetailScreen(planet: planet),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Solar System',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 1.5,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                  ),
+                  itemCount: planetProvider.planets.length,
+                  itemBuilder: (context, index) {
+                    final planet = planetProvider.planets[index];
+                    return PlanetCard(
+                      planet: planet,
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const PlanetDetailScreen(
-                              planetName: 'Mars',
-                            ),
+                            builder: (context) =>
+                                PlanetDetailScreen(planet: planet),
                           ),
                         );
                       },
-                    ),
-                    const SizedBox(width: 16),
-                    PlanetCard(
-                      name: 'Earth',
-                      description: 'Our home planet',
-                      imageUrl:
-                          'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-15%20113953-n1KU3kwCRWwbiFga25fAryiTq2vFQY.png',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PlanetDetailScreen(
-                              planetName: 'Earth',
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
             ],
@@ -100,7 +121,9 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF0B0D1C),
+        backgroundColor: Colors.black.withOpacity(0.7),
+        selectedItemColor: Theme.of(context).colorScheme.secondary,
+        unselectedItemColor: Colors.white.withOpacity(0.5),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -115,6 +138,19 @@ class HomeScreen extends StatelessWidget {
             label: 'Profile',
           ),
         ],
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const FavoritesScreen()),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfileScreen()),
+            );
+          }
+        },
       ),
     );
   }
