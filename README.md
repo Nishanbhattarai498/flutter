@@ -8,8 +8,21 @@
 - 📫 How to reach me: [nishanbhattarai1234567@gmail.com](mailto:nishanbhattarai1234567@gmail.com)
 - ⚡ Fun fact: I love hiking and photography.
 
-### GitHub Stats
-![Nishan's GitHub stats](https://github-readme-stats.vercel.app/api?username=Nishanbhattarai498&show_icons=true&theme=radical)
+### Skills
+
+#### Languages and Tools:
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![C](https://img.shields.io/badge/C-00599C?style=for-the-badge&logo=c&logoColor=white)
+![C++](https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=cplusplus&logoColor=white)
+
+#### Progress:
+![Flutter](https://img.shields.io/badge/Flutter-80%25-brightgreen?style=for-the-badge&logo=flutter)
+![Dart](https://img.shields.io/badge/Dart-70%25-brightgreen?style=for-the-badge&logo=dart)
+![Python](https://img.shields.io/badge/Python-90%25-brightgreen?style=for-the-badge&logo=python)
+![C](https://img.shields.io/badge/C-75%25-brightgreen?style=for-the-badge&logo=c)
+![C++](https://img.shields.io/badge/C++-65%25-brightgreen?style=for-the-badge&logo=cplusplus)
 
 ### Top Languages
 ![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=Nishanbhattarai498&layout=compact&theme=radical)
