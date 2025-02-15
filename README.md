@@ -15,5 +15,5 @@
 ![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=Nishanbhattarai498&layout=compact&theme=radical)
 
 ### Let's Connect
-- [LinkedIn](https://www.linkedin.com/in/nishanbhattarai498)
+- [LinkedIn](https://www.linkedin.com/in/nishan-bhattarai-8baa50287?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BDLOlIXnWQuqTwyH57Kij%2BA%3D%3D)
 - [Twitter](https://twitter.com/Nishanbhattarai498)
