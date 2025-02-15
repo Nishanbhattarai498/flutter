@@ -20,7 +20,7 @@
 #### Progress:
 ![Flutter](https://img.shields.io/badge/Flutter-80%25-brightgreen?style=for-the-badge&logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-70%25-brightgreen?style=for-the-badge&logo=dart)
-![Python](https://img.shields.io/badge/Python-90%25-brightgreen?style=for-the-badge&logo=python)
+![Python](https://img.shields.io/badge/Python-65%25-brightgreen?style=for-the-badge&logo=python)
 ![C](https://img.shields.io/badge/C-75%25-brightgreen?style=for-the-badge&logo=c)
 ![C++](https://img.shields.io/badge/C++-65%25-brightgreen?style=for-the-badge&logo=cplusplus)
 
