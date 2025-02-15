@@ -38,6 +38,33 @@ class LoginPage extends StatelessWidget {
                     style: TextStyle(
                         color: Colors.white)), // Ensure text is visible
               ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(FontAwesomeIcons.facebook, color: Colors.blue),
+                    onPressed: () {
+                      // Handle Facebook login
+                    },
+                  ),
+                  SizedBox(width: 20),
+                  IconButton(
+                    icon: Icon(FontAwesomeIcons.google, color: Colors.red),
+                    onPressed: () {
+                      // Handle Google login
+                    },
+                  ),
+                  SizedBox(width: 20),
+                  IconButton(
+                    icon:
+                        Icon(FontAwesomeIcons.twitter, color: Colors.lightBlue),
+                    onPressed: () {
+                      // Handle Twitter login
+                    },
+                  ),
+                ],
+              ),
             ],
           ),
         ),

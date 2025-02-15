@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:cosmicapp/providers/auth_provider.dart';
 import 'package:cosmicapp/providers/planet_provider.dart';
 import 'package:cosmicapp/screens/splash_screen.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart'; // Update this import
+import 'package:cosmicapp/screens/profile_screen.dart'; // Add this import
 
 void main() {
   runApp(
@@ -53,6 +53,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const SplashScreen(),
+      routes: {
+        '/profile': (context) => const ProfileScreen(), // Add this route
+      },
     );
   }
 }
@@ -101,7 +104,7 @@ class MyHomePage extends StatelessWidget {
     },
   ];
 
-  const MyHomePage({super.key});
+  MyHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {

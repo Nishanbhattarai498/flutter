@@ -33,6 +33,7 @@ class DatabaseMethods {
         .update({
       'lastMessage': lastMessageInfoMap['lastMessage'],
       'lastMessageSendTs': lastMessageInfoMap['lastMessageSendTs'],
+      'lastMessageSendBy': lastMessageInfoMap['lastMessageSendBy'],
     });
   }
 

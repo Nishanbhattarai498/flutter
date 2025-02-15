@@ -34,7 +34,7 @@ class PlanetProvider with ChangeNotifier {
     Planet(
       id: '2',
       name: 'Venus',
-      description: 'The hottest planet in our solar system.',
+      description: 'The second planet from the sun.',
       imageUrl: 'https://images.unsplash.com/photo-1614313913007-2b4ae8ce32d6',
       stats: {
         'Mass': '4.867 × 10²⁴ kg',
@@ -53,7 +53,61 @@ class PlanetProvider with ChangeNotifier {
         'Gravity': '9.807 m/s²',
       },
     ),
-    // Add more planets...
+    Planet(
+      id: '4',
+      name: 'Mars',
+      description: 'The red planet.',
+      imageUrl: 'https://images.unsplash.com/photo-1614732414444-096e5f1122d5',
+      stats: {
+        'Mass': '6.39 × 10²³ kg',
+        'Radius': '3,389.5 km',
+        'Gravity': '3.721 m/s²',
+      },
+    ),
+    Planet(
+      id: '5',
+      name: 'Jupiter',
+      description: 'The largest planet in our solar system.',
+      imageUrl: 'https://images.unsplash.com/photo-1614313913007-2b4ae8ce32d6',
+      stats: {
+        'Mass': '1.898 × 10²⁷ kg',
+        'Radius': '69,911 km',
+        'Gravity': '24.79 m/s²',
+      },
+    ),
+    Planet(
+      id: '6',
+      name: 'Saturn',
+      description: 'Known for its ring system.',
+      imageUrl: 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4',
+      stats: {
+        'Mass': '5.683 × 10²⁶ kg',
+        'Radius': '58,232 km',
+        'Gravity': '10.44 m/s²',
+      },
+    ),
+    Planet(
+      id: '7',
+      name: 'Uranus',
+      description: 'An ice giant with a unique tilt.',
+      imageUrl: 'https://images.unsplash.com/photo-1614732414444-096e5f1122d5',
+      stats: {
+        'Mass': '8.681 × 10²⁵ kg',
+        'Radius': '25,362 km',
+        'Gravity': '8.69 m/s²',
+      },
+    ),
+    Planet(
+      id: '8',
+      name: 'Neptune',
+      description: 'The farthest planet from the sun.',
+      imageUrl: 'https://images.unsplash.com/photo-1614313913007-2b4ae8ce32d6',
+      stats: {
+        'Mass': '1.024 × 10²⁶ kg',
+        'Radius': '24,622 km',
+        'Gravity': '11.15 m/s²',
+      },
+    ),
   ];
 
   List<Planet> get planets => _planets;

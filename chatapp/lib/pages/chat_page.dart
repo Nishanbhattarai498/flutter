@@ -68,7 +68,7 @@ class _ChatPageState extends State<ChatPage> {
               ),
               child: Text(message,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: sendByMe ? Colors.white : Colors.black,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   )),
@@ -142,6 +142,8 @@ class _ChatPageState extends State<ChatPage> {
       Map<String, dynamic> messageInfoMap = {
         "message": message,
         "sendBy": myUsername,
+        "sendById": myUsername, // Add sender ID
+        "receiveById": widget.username, // Add receiver ID
         "ts": formattedDate,
         "time": FieldValue.serverTimestamp(),
         "imageUrl": mypicture,

@@ -38,6 +38,7 @@ dependencies:
   cached_network_image: ^3.2.0
   flutter_animate: ^3.0.0
   font_awesome_flutter: ^10.1.0  # Add this line
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
